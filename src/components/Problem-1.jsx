@@ -3,10 +3,12 @@ import React, { useState } from "react";
 const Problem1 = () => {
   const [show, setShow] = useState("all");
   const [inputData, setInputData] = useState({});
+  const [store, setStore] = useState([]);
   const [data, setData] = useState([]);
 
   const handleClick = (val) => {
     setShow(val);
+    handleFilter(store, val)
   };
 
   // input handle
@@ -18,10 +20,24 @@ const Problem1 = () => {
   // store and update data
   const handleSubmit = (e) => {
     e.preventDefault();
-    let prev = [...data];
+    let prev = [...store];
     const { name, status } = inputData;
     prev.push({ name, status });
-    setData(prev);
+    setStore(makeSort(prev));
+    handleFilter(makeSort(prev), show);
+    setInputData({ name: "", status: "" });
+  };
+  
+
+  // filter
+  const handleFilter = (data, status) => {
+    const filterData = data.filter(
+        (item) =>{
+          if(status==='all') return item;
+          else if(item?.status?.toLowerCase() === status) return item;
+        }
+      );
+      setData(filterData);
   };
 
   const disabled = !inputData?.name || !inputData?.status;
@@ -118,3 +134,24 @@ const Problem1 = () => {
 };
 
 export default Problem1;
+
+const makeSort = (data = []) => {
+  data.sort((a, b) => {
+    if (a.status === "Active" || a.status === "Completed") {
+      return -1;
+    } else if (b.status === "Active" || b.status === "Completed") {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+
+  return data;
+};
+
+const ab = [
+  { name: "test", status: "Active" },
+  { name: "test", status: "Completed" },
+  { name: "test", status: "Pending" },
+  { name: "test", status: "Complex" },
+];
